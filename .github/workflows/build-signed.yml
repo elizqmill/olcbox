@@ -1,0 +1,90 @@
+name: Build Signed Android APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  OLCBOX_VERSION: "1.0.126"
+  OLCBOX_VERSION_CODE: "126"
+  ANDROID_NDK_VERSION: "28.2.13676358"
+
+jobs:
+  build-android-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout olcbox
+        uses: actions/checkout@v7
+        with:
+          path: olcbox
+
+      - name: Checkout olcrtc
+        uses: actions/checkout@v7
+        with:
+          repository: openlibrecommunity/olcrtc
+          ref: master
+          path: olcrtc
+          submodules: recursive
+
+      - name: Setup JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: 'stable'
+          cache-dependency-path: olcrtc/go.sum
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Install Android SDK packages
+        run: |
+          sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;${ANDROID_NDK_VERSION}"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Install Go mobile tooling
+        run: |
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+          go install golang.org/x/mobile/cmd/gomobile@latest
+          go install github.com/magefile/mage@latest
+
+      - name: Initialize gomobile
+        working-directory: olcrtc
+        run: |
+          export ANDROID_NDK_HOME="${ANDROID_HOME}/ndk/${ANDROID_NDK_VERSION}"
+          export ANDROID_NDK_ROOT="${ANDROID_NDK_HOME}"
+          gomobile init
+
+      - name: Configure Android release signing
+        working-directory: olcbox
+        run: |
+          printf '%s' "${ANDROID_RELEASE_KEYSTORE_BASE64}" | tr -d '\r\n' | base64 --decode > release-keystore.jks
+          cat > keystore.properties <<EOF
+          storeFile=release-keystore.jks
+          storePassword=${ANDROID_RELEASE_STORE_PASSWORD}
+          keyAlias=${ANDROID_RELEASE_KEY_ALIAS}
+          keyPassword=${ANDROID_RELEASE_KEY_PASSWORD}
+          EOF
+
+      - name: Build universal signed APK
+        working-directory: olcbox
+        run: |
+          export OLCRTC_REPO="${{ github.workspace }}/olcrtc"
+          export ANDROID_NDK_HOME="${ANDROID_HOME}/ndk/${ANDROID_NDK_VERSION}"
+          export ANDROID_NDK_ROOT="${ANDROID_NDK_HOME}"
+          ./gradlew -Polcbox.version="${OLCBOX_VERSION}" -Polcbox.versionCode="${OLCBOX_VERSION_CODE}" :androidApp:assembleRelease --stacktrace
+
+      - name: Upload signed APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: olcbox-${{ env.OLCBOX_VERSION }}-android-signed
+          path: olcbox/androidApp/build/outputs/apk/release/*.apk
