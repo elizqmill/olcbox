@@ -27,6 +27,9 @@ internal data class OlcRtcCommand(
             appendLine("  provider: ${provider.yamlValue()}")
             appendLine("room:")
             appendLine("  id: ${config.id.yamlValue()}")
+            if (config.roomPassword.isNotBlank()) {
+                appendLine("  password: ${config.roomPassword.yamlValue()}")
+            }
             appendLine("crypto:")
             appendLine("  key: ${config.key.yamlValue()}")
             appendLine("net:")

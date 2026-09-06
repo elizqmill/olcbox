@@ -29,7 +29,9 @@ data class LocationConfig(
     @SerialName("vp8_batch")
     val vp8Batch: Int = DEFAULT_VP8_BATCH,
     @SerialName("dns_server")
-    val dnsServer: String = ""
+    val dnsServer: String = "",
+    @SerialName("room_password")
+    val roomPassword: String = ""
 ) {
     fun normalized(): LocationConfig {
         val provider = normalizeProvider(bypassProvider)
@@ -42,7 +44,8 @@ data class LocationConfig(
             transport = normalizedTransport,
             dnsServer = dnsServer.trim().take(MAX_DNS_SERVER_LENGTH),
             vp8Fps = sanitizeVp8Fps(vp8Fps),
-            vp8Batch = sanitizeVp8Batch(vp8Batch)
+            vp8Batch = sanitizeVp8Batch(vp8Batch),
+            roomPassword = roomPassword.trim()
         )
     }
 
@@ -316,7 +319,9 @@ data class LocationEndpointConfig(
     val roomId: String = "",
     val key: String = "",
     @SerialName("client_id")
-    val legacyClientId: String? = null
+    val legacyClientId: String? = null,
+    @SerialName("room_password")
+    val roomPassword: String = ""
 )
 
 @Serializable
@@ -588,7 +593,8 @@ data class LocationEntry(
                     ?: legacyVp8Batch
                     ?: legacyVp8BatchCamel
                     ?: LocationConfig.DEFAULT_VP8_BATCH,
-                dnsServer = firstNotBlank(dnsServer, legacyDnsServerCamel)
+                dnsServer = firstNotBlank(dnsServer, legacyDnsServerCamel),
+                roomPassword = endpoint?.roomPassword ?: ""
             ).normalized()
         }
 
@@ -603,7 +609,8 @@ data class LocationEntry(
             subscriptionUrl = firstNotBlank(subscriptionUrl, legacySubscriptionUrl).ifBlank { null },
             endpoint = LocationEndpointConfig(
                 roomId = config.id,
-                key = config.key
+                key = config.key,
+                roomPassword = config.roomPassword
             ),
             authProvider = config.bypassProvider,
             transport = LocationTransportConfig.from(config),
@@ -628,7 +635,8 @@ data class LocationEntry(
                 subscriptionUrl = subscriptionUrl,
                 endpoint = LocationEndpointConfig(
                     roomId = config.id,
-                    key = config.key
+                    key = config.key,
+                    roomPassword = config.roomPassword
                 ),
                 authProvider = config.bypassProvider,
                 transport = LocationTransportConfig.from(config),

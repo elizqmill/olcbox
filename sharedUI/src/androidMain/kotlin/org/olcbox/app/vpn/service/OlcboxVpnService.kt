@@ -653,6 +653,9 @@ class OlcboxVpnService : VpnService() {
         olcRtcRuntime.setSocksPort(socksPort.toLong())
         olcRtcRuntime.setSocksCredentials(socksUsername, socksPassword)
         olcRtcRuntime.setVP8Options(config.vp8Fps.toLong(), config.vp8Batch.toLong())
+        if (config.roomPassword.isNotBlank()) {
+            olcRtcRuntime.setRoomPassword(config.roomPassword)
+        }
     }
 
     private fun startTun2socks(pfd: ParcelFileDescriptor): Boolean {

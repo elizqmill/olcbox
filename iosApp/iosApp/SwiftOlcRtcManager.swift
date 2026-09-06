@@ -37,6 +37,9 @@ final class SwiftOlcRtcManager: NSObject, @unchecked Sendable, IosOlcRtcBridge {
             try runtime.setSocksPort(Int(request.socksPort))
             try runtime.setSocksCredentials(request.socksUser, password: request.socksPass)
             try runtime.setVP8Options(Int(request.vp8Fps), batchSize: Int(request.vp8BatchSize))
+            if !request.roomPassword.isEmpty {
+                runtime.setRoomPassword(request.roomPassword)
+            }
             try runtime.start()
             try runtime.waitReady(8_000)
         } catch {

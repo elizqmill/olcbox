@@ -352,7 +352,8 @@ class IosVpnManager(
             socksPass = settings.password,
             dnsServer = config.dnsServer.ifBlank { DEFAULT_OLCRTC_DNS_SERVER },
             vp8Fps = config.vp8Fps,
-            vp8BatchSize = config.vp8Batch
+            vp8BatchSize = config.vp8Batch,
+            roomPassword = config.roomPassword
         )
     }
 

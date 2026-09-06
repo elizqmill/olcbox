@@ -26,6 +26,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Key
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.MeetingRoom
 import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material3.Button
@@ -256,6 +257,22 @@ fun LocationSettingsScreen(
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
                 )
+            }
+
+            if (isJitsiProvider(config.bypassProvider)) {
+                item {
+                    SettingsTextField(
+                        value = config.roomPassword,
+                        onValueChange = viewModel::onRoomPasswordChanged,
+                        label = "Room password (optional)",
+                        placeholder = "Leave empty if no password",
+                        enabled = !isSaving,
+                        leadingIcon = Icons.Rounded.Lock,
+                        onClear = { viewModel.onRoomPasswordChanged("") },
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                    )
+                }
             }
 
             item {

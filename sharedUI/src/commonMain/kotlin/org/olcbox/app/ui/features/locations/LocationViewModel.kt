@@ -367,6 +367,10 @@ class LocationViewModel(
         validateKey(value)
     }
 
+    fun onRoomPasswordChanged(value: String) {
+        editingConfig = editingConfig.copy(roomPassword = value)
+    }
+
     fun onBypassProviderChanged(value: String) {
         val provider = LocationConfig.normalizeProvider(value)
         val currentProvider = LocationConfig.normalizeProvider(editingConfig.bypassProvider)
@@ -374,7 +378,8 @@ class LocationViewModel(
 
         providerDrafts[currentProvider] = ProviderDraft(
             room = editingConfig.id,
-            key = editingConfig.key
+            key = editingConfig.key,
+            roomPassword = editingConfig.roomPassword
         )
 
         if (provider != LocationConfig.PROVIDER_JITSI) {
@@ -391,7 +396,8 @@ class LocationViewModel(
                 LocationConfig.normalizeTransport(editingConfig.transport, provider)
             },
             id = restored.room,
-            key = restored.key
+            key = restored.key,
+            roomPassword = restored.roomPassword
         )
         serverError = null
         keyError = null
@@ -506,6 +512,7 @@ class LocationViewModel(
 
     private data class ProviderDraft(
         val room: String = "",
-        val key: String = ""
+        val key: String = "",
+        val roomPassword: String = ""
     )
 }

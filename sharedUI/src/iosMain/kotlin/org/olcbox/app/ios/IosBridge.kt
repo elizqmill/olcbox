@@ -11,7 +11,8 @@ data class IosOlcRtcStartRequest(
     val socksPass: String,
     val dnsServer: String,
     val vp8Fps: Int,
-    val vp8BatchSize: Int
+    val vp8BatchSize: Int,
+    val roomPassword: String = ""
 )
 
 data class IosOlcRtcCheckRequest(
