@@ -267,6 +267,8 @@ fun LocationSettingsScreen(
                         label = "Room password (optional)",
                         placeholder = "Leave empty if no password",
                         enabled = !isSaving,
+                        isError = false,
+                        supportingText = null,
                         leadingIcon = Icons.Rounded.Lock,
                         onClear = { viewModel.onRoomPasswordChanged("") },
                         visualTransformation = PasswordVisualTransformation(),
