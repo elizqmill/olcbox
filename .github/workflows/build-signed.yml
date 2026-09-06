@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 env:
-  OLCBOX_VERSION: "1.0.126"
-  OLCBOX_VERSION_CODE: "126"
+  OLCBOX_VERSION: "1.0.128"
+  OLCBOX_VERSION_CODE: "128"
   ANDROID_NDK_VERSION: "28.2.13676358"
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
       - name: Checkout olcrtc
         uses: actions/checkout@v7
         with:
-          repository: openlibrecommunity/olcrtc
+          repository: elizqmill/olcrtc
           ref: master
           path: olcrtc
           submodules: recursive
@@ -75,16 +75,154 @@ jobs:
           keyPassword=${ANDROID_RELEASE_KEY_PASSWORD}
           EOF
 
+      # ── universal (all ABIs) ──────────────────────────────────────────
       - name: Build universal signed APK
         working-directory: olcbox
         run: |
           export OLCRTC_REPO="${{ github.workspace }}/olcrtc"
           export ANDROID_NDK_HOME="${ANDROID_HOME}/ndk/${ANDROID_NDK_VERSION}"
           export ANDROID_NDK_ROOT="${ANDROID_NDK_HOME}"
-          ./gradlew -Polcbox.version="${OLCBOX_VERSION}" -Polcbox.versionCode="${OLCBOX_VERSION_CODE}" :androidApp:assembleRelease --stacktrace
+          ./gradlew \
+            -Polcbox.version="${OLCBOX_VERSION}" \
+            -Polcbox.versionCode="${OLCBOX_VERSION_CODE}" \
+            :androidApp:assembleRelease --stacktrace
 
-      - name: Upload signed APK
+      - name: Collect universal APK
+        working-directory: olcbox
+        run: |
+          mkdir -p dist
+          release_apk="$(find androidApp/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | sort | head -n 1)"
+          if [ -z "${release_apk}" ]; then
+            echo "Universal APK was not found" >&2
+            exit 1
+          fi
+          cp "${release_apk}" "dist/Olcbox-${OLCBOX_VERSION}-android-universal.apk"
+
+      # ── arm64-v8a ─────────────────────────────────────────────────────
+      - name: Build arm64-v8a signed APK
+        working-directory: olcbox
+        run: |
+          export OLCRTC_REPO="${{ github.workspace }}/olcrtc"
+          export ANDROID_NDK_HOME="${ANDROID_HOME}/ndk/${ANDROID_NDK_VERSION}"
+          export ANDROID_NDK_ROOT="${ANDROID_NDK_HOME}"
+          ./gradlew \
+            -Polcbox.version="${OLCBOX_VERSION}" \
+            -Polcbox.versionCode="${OLCBOX_VERSION_CODE}" \
+            -Polcbox.android.abiFilters=arm64-v8a \
+            :androidApp:clean :androidApp:assembleRelease --stacktrace
+
+      - name: Collect arm64-v8a APK
+        working-directory: olcbox
+        run: |
+          release_apk="$(find androidApp/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | sort | head -n 1)"
+          if [ -z "${release_apk}" ]; then
+            echo "arm64-v8a APK was not found" >&2
+            exit 1
+          fi
+          cp "${release_apk}" "dist/Olcbox-${OLCBOX_VERSION}-android-arm64-v8a.apk"
+
+      # ── armeabi-v7a ───────────────────────────────────────────────────
+      - name: Build armeabi-v7a signed APK
+        working-directory: olcbox
+        run: |
+          export OLCRTC_REPO="${{ github.workspace }}/olcrtc"
+          export ANDROID_NDK_HOME="${ANDROID_HOME}/ndk/${ANDROID_NDK_VERSION}"
+          export ANDROID_NDK_ROOT="${ANDROID_NDK_HOME}"
+          ./gradlew \
+            -Polcbox.version="${OLCBOX_VERSION}" \
+            -Polcbox.versionCode="${OLCBOX_VERSION_CODE}" \
+            -Polcbox.android.abiFilters=armeabi-v7a \
+            :androidApp:clean :androidApp:assembleRelease --stacktrace
+
+      - name: Collect armeabi-v7a APK
+        working-directory: olcbox
+        run: |
+          release_apk="$(find androidApp/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | sort | head -n 1)"
+          if [ -z "${release_apk}" ]; then
+            echo "armeabi-v7a APK was not found" >&2
+            exit 1
+          fi
+          cp "${release_apk}" "dist/Olcbox-${OLCBOX_VERSION}-android-armeabi-v7a.apk"
+
+      # ── x86_64 ────────────────────────────────────────────────────────
+      - name: Build x86_64 signed APK
+        working-directory: olcbox
+        run: |
+          export OLCRTC_REPO="${{ github.workspace }}/olcrtc"
+          export ANDROID_NDK_HOME="${ANDROID_HOME}/ndk/${ANDROID_NDK_VERSION}"
+          export ANDROID_NDK_ROOT="${ANDROID_NDK_HOME}"
+          ./gradlew \
+            -Polcbox.version="${OLCBOX_VERSION}" \
+            -Polcbox.versionCode="${OLCBOX_VERSION_CODE}" \
+            -Polcbox.android.abiFilters=x86_64 \
+            :androidApp:clean :androidApp:assembleRelease --stacktrace
+
+      - name: Collect x86_64 APK
+        working-directory: olcbox
+        run: |
+          release_apk="$(find androidApp/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | sort | head -n 1)"
+          if [ -z "${release_apk}" ]; then
+            echo "x86_64 APK was not found" >&2
+            exit 1
+          fi
+          cp "${release_apk}" "dist/Olcbox-${OLCBOX_VERSION}-android-x86_64.apk"
+
+      # ── checksums ──────────────────────────────────────────────────────
+      - name: Generate checksums
+        working-directory: olcbox
+        run: |
+          cd dist
+          sha256sum *.apk > SHA256SUMS.txt
+          echo "### SHA256 checksums" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat SHA256SUMS.txt >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      # ── upload artifact ────────────────────────────────────────────────
+      - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: olcbox-${{ env.OLCBOX_VERSION }}-android-signed
-          path: olcbox/androidApp/build/outputs/apk/release/*.apk
+          name: Olcbox-${{ env.OLCBOX_VERSION }}-android-all
+          path: olcbox/dist/*
+
+      # ── GitHub Release ─────────────────────────────────────────────────
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        working-directory: olcbox
+        run: |
+          tag="v${OLCBOX_VERSION}"
+
+          release_body="$(cat <<'EOF'
+          ## Olcbox ${OLCBOX_VERSION}
+
+          ### Android APKs
+
+          | Architecture | File | Description |
+          | --- | --- | --- |
+          | **universal** | `Olcbox-${OLCBOX_VERSION}-android-universal.apk` | All architectures (arm64, armv7, x86_64) — works on every device |
+          | **arm64-v8a** | `Olcbox-${OLCBOX_VERSION}-android-arm64-v8a.apk` | 64-bit ARM — most modern phones |
+          | **armeabi-v7a** | `Olcbox-${OLCBOX_VERSION}-android-armeabi-v7a.apk` | 32-bit ARM — older/cheaper devices |
+          | **x86_64** | `Olcbox-${OLCBOX_VERSION}-android-x86_64.apk` | x86_64 — emulators, ChromeOS |
+
+          ### Changes
+          - Jitsi room password support (XEP-0045)
+          - Updated olcrtc kernel with password-aware XMPP presence
+
+          ### SHA256
+          \`\`\`
+          $(cat dist/SHA256SUMS.txt)
+          \`\`\`
+          EOF
+          )"
+
+          if gh release view "${tag}" >/dev/null 2>&1; then
+            gh release delete "${tag}" --yes --cleanup-tag
+          fi
+
+          gh release create "${tag}" \
+            --target "${GITHUB_SHA}" \
+            --title "Olcbox ${OLCBOX_VERSION}" \
+            --notes "${release_body}" \
+            dist/Olcbox-${OLCBOX_VERSION}-android-*.apk \
+            dist/SHA256SUMS.txt
