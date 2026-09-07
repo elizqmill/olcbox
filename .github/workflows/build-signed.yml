@@ -7,8 +7,8 @@ permissions:
   contents: write
 
 env:
-  OLCBOX_VERSION: "1.0.128"
-  OLCBOX_VERSION_CODE: "128"
+  OLCBOX_VERSION: "1.0.129"
+  OLCBOX_VERSION_CODE: "129"
   ANDROID_NDK_VERSION: "28.2.13676358"
   GOWORK: "off"
 
