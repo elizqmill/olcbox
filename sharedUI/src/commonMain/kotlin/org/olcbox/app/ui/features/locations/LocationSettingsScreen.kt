@@ -653,6 +653,10 @@ private fun isJazzProvider(provider: String): Boolean {
     return LocationConfig.normalizeProvider(provider) == LocationConfig.PROVIDER_JAZZ
 }
 
+private fun isJitsiProvider(provider: String): Boolean {
+    return LocationConfig.normalizeProvider(provider) == LocationConfig.PROVIDER_JITSI
+}
+
 private enum class ConnectionType(val label: String) {
     Service("Service"),
     Jitsi("Jitsi")
