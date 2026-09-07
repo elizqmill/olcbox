@@ -259,7 +259,7 @@ fun LocationSettingsScreen(
                 )
             }
 
-            if (isJitsiProvider(config.bypassProvider)) {
+            if (isJazzProvider(config.bypassProvider)) {
                 item {
                     SettingsTextField(
                         value = config.roomPassword,
@@ -649,9 +649,8 @@ private fun roomKeyboardType(provider: String): KeyboardType {
     return if (isJitsiProvider(provider)) KeyboardType.Uri else KeyboardType.Text
 }
 
-private fun isJitsiProvider(provider: String): Boolean {
-    val normalized = LocationConfig.normalizeProvider(provider)
-    return normalized == LocationConfig.PROVIDER_JITSI || normalized == LocationConfig.PROVIDER_JAZZ
+private fun isJazzProvider(provider: String): Boolean {
+    return LocationConfig.normalizeProvider(provider) == LocationConfig.PROVIDER_JAZZ
 }
 
 private enum class ConnectionType(val label: String) {
