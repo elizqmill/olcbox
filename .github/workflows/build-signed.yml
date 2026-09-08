@@ -210,17 +210,17 @@ jobs:
         run: |
           tag="v${OLCBOX_VERSION}"
 
-          release_body="$(cat <<'EOF'
+          release_body="$(cat <<EOF
           ## Olcbox ${OLCBOX_VERSION}
 
           ### Android APKs
 
           | Architecture | File | Description |
           | --- | --- | --- |
-          | **universal** | `Olcbox-${OLCBOX_VERSION}-android-universal.apk` | All architectures (arm64, armv7, x86_64) — works on every device |
-          | **arm64-v8a** | `Olcbox-${OLCBOX_VERSION}-android-arm64-v8a.apk` | 64-bit ARM — most modern phones |
-          | **armeabi-v7a** | `Olcbox-${OLCBOX_VERSION}-android-armeabi-v7a.apk` | 32-bit ARM — older/cheaper devices |
-          | **x86_64** | `Olcbox-${OLCBOX_VERSION}-android-x86_64.apk` | x86_64 — emulators, ChromeOS |
+          | **universal** | \`Olcbox-${OLCBOX_VERSION}-android-universal.apk\` | All architectures (arm64, armv7, x86_64) — works on every device |
+          | **arm64-v8a** | \`Olcbox-${OLCBOX_VERSION}-android-arm64-v8a.apk\` | 64-bit ARM — most modern phones |
+          | **armeabi-v7a** | \`Olcbox-${OLCBOX_VERSION}-android-armeabi-v7a.apk\` | 32-bit ARM — older/cheaper devices |
+          | **x86_64** | \`Olcbox-${OLCBOX_VERSION}-android-x86_64.apk\` | x86_64 — emulators, ChromeOS |
 
           ### Changes
           - Fixed YouTube not working through SOCKS5 proxy + AdGuard
