@@ -78,9 +78,9 @@ internal object OlcRtcConnectionChecker {
     }
 
     private const val CONNECTION_CHECK_ATTEMPTS = 2
-    private const val CONNECTION_CHECK_TIMEOUT_MS = 8_000L
+    private const val CONNECTION_CHECK_TIMEOUT_MS = 15_000L
 
-    private const val HTTP_PING_ATTEMPTS = 1
-    private const val HTTP_PING_TIMEOUT_MS = 8_000L
+    private const val HTTP_PING_ATTEMPTS = 2
+    private const val HTTP_PING_TIMEOUT_MS = 15_000L
     private const val HTTP_PING_URL = "https://www.google.com/generate_204"
 }
