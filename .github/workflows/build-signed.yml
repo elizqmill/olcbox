@@ -7,8 +7,8 @@ permissions:
   contents: write
 
 env:
-  OLCBOX_VERSION: "1.0.129"
-  OLCBOX_VERSION_CODE: "129"
+  OLCBOX_VERSION: "1.0.130"
+  OLCBOX_VERSION_CODE: "130"
   ANDROID_NDK_VERSION: "28.2.13676358"
   GOWORK: "off"
 
@@ -223,8 +223,9 @@ jobs:
           | **x86_64** | `Olcbox-${OLCBOX_VERSION}-android-x86_64.apk` | x86_64 — emulators, ChromeOS |
 
           ### Changes
+          - Fixed YouTube not working through SOCKS5 proxy + AdGuard
+          - olcrtc now sends proper SOCKS5 error responses for unsupported commands
           - Jitsi room password support (XEP-0045)
-          - Updated olcrtc kernel with password-aware XMPP presence
 
           ### SHA256
           \`\`\`
