@@ -643,6 +643,7 @@ class OlcboxVpnService : VpnService() {
         socksPort: Int
     ) {
         val config = location.normalized()
+        olcRtcRuntime.setDebug(true)
         olcRtcRuntime.setProvider(config.bypassProvider)
         olcRtcRuntime.setTransport(config.transport)
         olcRtcRuntime.setRoom(config.id)

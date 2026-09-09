@@ -17,7 +17,9 @@ internal object OlcRtcConnectionChecker {
                 val socksPort = allocateLocalPort()
 
                 val result: Long? = runCatching {
-                    Mobile.new_().check(
+                    val runtime = Mobile.new_()
+                    runtime.setDebug(true)
+                    runtime.check(
                         config.bypassProvider,
                         config.transport,
                         config.id,
@@ -48,7 +50,9 @@ internal object OlcRtcConnectionChecker {
                 val socksPort = allocateLocalPort()
 
                 val result: Long? = runCatching {
-                    Mobile.new_().ping(
+                    val runtime = Mobile.new_()
+                    runtime.setDebug(true)
+                    runtime.ping(
                         config.bypassProvider,
                         config.transport,
                         config.id,
