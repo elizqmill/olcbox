@@ -7,8 +7,8 @@ permissions:
   contents: write
 
 env:
-  OLCBOX_VERSION: "1.0.131"
-  OLCBOX_VERSION_CODE: "131"
+  OLCBOX_VERSION: "1.0.132"
+  OLCBOX_VERSION_CODE: "132"
   ANDROID_NDK_VERSION: "28.2.13676358"
   GOWORK: "off"
 
@@ -223,8 +223,7 @@ jobs:
           | **x86_64** | \`Olcbox-${OLCBOX_VERSION}-android-x86_64.apk\` | x86_64 — emulators, ChromeOS |
 
           ### Changes
-          - Increased ping timeout 8s→15s for WB/Telemost/Jazz (LiveKit/Goolom engines)
-          - Added probe logging for connection diagnostics
+          - **Fixed WB/Telemost/Jazz probe always showing "Offline"** (vp8channel): `ControlPeerCanSend` was gated on `SubscriberCanSend`, which on the server side is never ready (server publishes but doesn't subscribe). This deadlocked the handshake response, so the probe client always timed out.
           - olcrtc sends proper SOCKS5 error responses for unsupported commands
           - Jitsi room password support (XEP-0045)
 
