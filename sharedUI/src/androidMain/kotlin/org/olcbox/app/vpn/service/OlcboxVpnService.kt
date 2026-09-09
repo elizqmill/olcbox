@@ -251,6 +251,8 @@ class OlcboxVpnService : VpnService() {
             .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Olcbox::VpnWakeLock")
             .apply { setReferenceCounted(false) }
 
+        Mobile.initLogFile(cacheDir.absolutePath)
+        OlcboxVpnState.startOlcrtcLogPolling(scope)
         installMobileCallbacks()
     }
 
